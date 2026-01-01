@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine PIS</title>
+    <style>
+        /* Um CSS básico para não ficar tudo branco */
+        body { font-family: sans-serif; background-color: #f0f0f0; padding: 20px; }
+        .grid { display: flex; gap: 20px; flex-wrap: wrap; }
+        .card { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            width: 250px;
+        }
+        .card h3 { margin-top: 0; color: #333; }
+        .tag { background: #007bff; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <h1>🎬 Catálogo de Filmes e Séries</h1>
+    
+    <div id="conteudo-lista" class="grid">
+        <p>A carregar filmes...</p>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
