@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Só carrega filmes se estivermos na página que tem a div "conteudo-lista"
+    // Só carrega filmes só na página que tem a div "conteudo-lista"
     if(document.getElementById('conteudo-lista')) {
         carregarFilmes();
     }

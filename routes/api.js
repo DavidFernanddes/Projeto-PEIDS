@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db'); // Importa a ligação à BD
+const db = require('../config/db');
 
 // 1. Rota de Teste
 router.get('/status', (req, res) => {
@@ -13,7 +13,7 @@ router.get('/status', (req, res) => {
 // 2. Rota para LISTAR filmes (Usada pelo Front-end)
 router.get('/filmes', async (req, res) => {
     try {
-        // Vai buscar todos os filmes à tabela 'contents'
+        // todos os filmes à tabela 'contents'
         const [rows] = await db.query('SELECT * FROM contents');
         res.json(rows);
     } catch (error) {
@@ -34,7 +34,7 @@ router.get('/importar', async (req, res) => {
     try {
         console.log("A contactar o TMDB...");
         
-        // Faz o pedido à Internet (fetch nativo do Node.js)
+        // fetch nativo do Node.js
         const resposta = await fetch(url);
         
         if (!resposta.ok) {
@@ -88,7 +88,7 @@ router.get('/filmes/:id', async (req, res) => {
     const idFilme = req.params.id;
 
     try {
-        // O '?' é substituído pelo idFilme para segurança
+        // '?' substituído pelo idFilme para segurança
         const [rows] = await db.query('SELECT * FROM contents WHERE id = ?', [idFilme]);
 
         if (rows.length === 0) {
