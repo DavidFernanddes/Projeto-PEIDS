@@ -3,29 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cine PIS</title>
+    <title>CinePIS - Home</title>
+    <link rel="stylesheet" href="css/global.css">
     <style>
-        /* CSS temporario */
-        body { font-family: sans-serif; background-color: #f0f0f0; padding: 20px; }
-        .grid { display: flex; gap: 20px; flex-wrap: wrap; }
-        .card { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            width: 250px;
+        /* CSS Específico para a Homepage */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #141414; /* Fundo escuro estilo Netflix */
+            color: #fff; 
+            margin: 0;
+            padding: 0;
         }
-        .card h3 { margin-top: 0; color: #333; }
-        .tag { background: #007bff; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #e50914; text-decoration: none; }
+        .nav-links a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        .nav-links a:hover { color: #b3b3b3; }
+        .btn-login { background-color: #e50914; padding: 8px 15px; border-radius: 4px; }
+        .btn-login:hover { background-color: #f40612; color: white; }
+
+        /* Hero Section (Título) */
+        .hero { padding: 40px; text-align: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .hero p { color: #aaa; }
+
+        /* Grelha de Filmes */
+        .container { padding: 20px 40px; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 25px; 
+        }
+
+        /* Card do Filme */
+        .card { 
+            background: #2f2f2f; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        .card:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .card img { width: 100%; height: 300px; object-fit: cover; }
+        
+        .card-info { padding: 15px; }
+        .card-title { font-size: 1rem; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: #aaa; }
+        .rating { color: #46d369; font-weight: bold; } /* Verde estilo match */
+
+        /* Loading */
+        #loading { text-align: center; margin-top: 50px; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <h1>Filmes e Séries</h1>
+
+    <nav>
+        <a href="/" class="logo">CINE PIS</a>
+        <div class="nav-links" id="nav-menu">
+            <a href="/pages/auth/login.html" class="btn-login">Entrar</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Filmes e Séries em Destaque</h1>
+        <p>Projeto de Integração de Serviços - 2025/2026</p>
+    </div>
     
-    <div id="conteudo-lista" class="grid">
-        <p>A carregar filmes...</p>
+    <div class="container">
+        <div id="loading">A carregar catálogo... 🍿</div>
+        <div id="conteudo-lista" class="grid"></div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script>
+        // 1. Verificar Login (Versão JWT)
+        function checkSession() {
+            // Tenta ler o token e o user do navegador
+            const token = localStorage.getItem('token');
+            const userStored = localStorage.getItem('user');
+            
+            const navMenu = document.getElementById('nav-menu');
+
+            if (token && userStored) {
+                // SE EXISTIR TOKEN: Mostra o nome e o Logout
+                const user = JSON.parse(userStored); // Converte o texto JSON para Objeto
+                
+                let html = `<span style="margin-right: 15px;">Olá, <strong>${user.name}</strong></span>`;
+                
+                // Se for Admin, mostra botão Backoffice
+                if (user.role === 'admin') {
+                    html += `<a href="/pages/backoffice/home.html" style="color: #f4c10f; margin-right: 15px; text-decoration:none;">⚙️ Backoffice</a>`;
+                }
+
+                // Botão Logout (que apaga o token)
+                html += `<a href="#" onclick="logout()" style="color: #ff4d4d; text-decoration:none;">Sair</a>`;
+                
+                navMenu.innerHTML = html;
+            } else {
+                // SE NÃO EXISTIR TOKEN: Mostra Entrar/Registar
+                navMenu.innerHTML = `
+                    <a href="/pages/auth/register.html" style="color:white; text-decoration:none; margin-right:15px;">Registar</a>
+                    <a href="/pages/auth/login.html" class="btn-login" style="color:white; text-decoration:none; background:#e50914; padding:5px 10px; border-radius:5px;">Entrar</a>
+                `;
+            }
+        }
+
+        // Função de Logout (Simples: apaga o token e recarrega)
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.reload(); 
+        }
+
+        // 2. Carregar Filmes (Esta parte já tinhas e funciona)
+        async function loadMovies() {
+            try {
+                const res = await fetch('/api/filmes');
+                const filmes = await res.json();
+                
+                const container = document.getElementById('conteudo-lista');
+                const loading = document.getElementById('loading');
+                
+                if(loading) loading.style.display = 'none';
+
+                if (filmes.length === 0) {
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum filme encontrado. <a href="/api/importar">Clique aqui para importar</a>.</p>';
+                    return;
+                }
+
+                container.innerHTML = filmes.map(filme => {
+                    const ano = new Date(filme.release_date).getFullYear();
+                    const nota = Number(filme.vote_average).toFixed(1);
+
+                    return `
+                        <div class="card" onclick="window.location.href='/pages/frontoffice/detalhes.html?id=${filme.id}'">
+                            <img src="${filme.poster_path}" alt="${filme.title}">
+                            <div class="card-info">
+                                <h3 class="card-title">${filme.title}</h3>
+                                <div class="card-meta">
+                                    <span>${ano}</span>
+                                    <span class="rating">⭐ ${nota}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error(error);
+                if(document.getElementById('loading')) 
+                    document.getElementById('loading').innerText = "Erro ao carregar filmes.";
+            }
+        }
+
+        // Iniciar
+        checkSession();
+        loadMovies();
+    </script>
 </body>
 </html>

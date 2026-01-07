@@ -1,10 +1,11 @@
 // controllers/contentController.js
 const db = require('../config/db');
 
-// Importar filmes da API TMDB e guardar na nossa BD complexa
+// Importar filmes da API TMDB
 exports.importMoviesFromTMDB = async (req, res) => {
     const apiKey = process.env.TMDB_API_KEY;
-    // Buscar filmes populares
+    if (!apiKey) return res.status(500).json({ error: 'Falta API KEY' });
+
     const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-PT&page=1`;
 
     try {
@@ -14,13 +15,14 @@ exports.importMoviesFromTMDB = async (req, res) => {
         let count = 0;
 
         for (const movie of filmes) {
-            // 1. Verificar se filme já existe (pelo ID do TMDB)
+            // Verificar duplicados
             const [exists] = await db.query('SELECT id FROM contents WHERE tmdb_id = ?', [movie.id]);
-            if (exists.length > 0) continue; // Salta se já existe
+            if (exists.length > 0) continue; 
 
-            // 2. Inserir Filme
+            // Inserir Filme
             const sqlFilme = `INSERT INTO contents (tmdb_id, title, synopsis, type, release_date, poster_path, backdrop_path, vote_average) VALUES (?, ?, ?, 'movie', ?, ?, ?, ?)`;
-            const [result] = await db.query(sqlFilme, [
+            
+            await db.query(sqlFilme, [
                 movie.id, 
                 movie.title, 
                 movie.overview, 
@@ -29,17 +31,9 @@ exports.importMoviesFromTMDB = async (req, res) => {
                 `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
                 movie.vote_average
             ]);
-            
-            const contentId = result.insertId;
             count++;
-
-            // 3. Processar Géneros (Serviço Composto)
-            // A API devolve array de IDs [28, 12]. Precisamos de saber os nomes ou inserir só a relação.
-            // Para simplificar neste prazo, vamos assumir que tens uma função auxiliar ou fazes fetch dos detalhes se necessário.
-            // (Podemos melhorar isto na próxima iteração se quiseres o detalhe fino dos géneros).
         }
-
-        res.json({ message: `Importação concluída. ${count} filmes novos adicionados.` });
+        res.json({ message: `Sucesso! ${count} filmes importados.` });
 
     } catch (error) {
         console.error(error);
@@ -57,12 +51,16 @@ exports.getAllContents = async (req, res) => {
     }
 };
 
-// Detalhes do Filme (Com Géneros e Reviews)
+// Detalhes do Filme
 exports.getContentById = async (req, res) => {
     const { id } = req.params;
     try {
         const [movie] = await db.query('SELECT * FROM contents WHERE id = ?', [id]);
-        if (movie.length === 0) return res.status(404).json({ error: 'Não encontrado' });
+        
+        if (movie.length === 0) {
+            // Se não encontrar, envia erro JSON (e não HTML)
+            return res.status(404).json({ error: 'Filme não encontrado' });
+        }
 
         // Buscar Reviews
         const [reviews] = await db.query(
@@ -73,9 +71,10 @@ exports.getContentById = async (req, res) => {
             [id]
         );
 
-        // Devolver tudo junto
+        // Devolver tudo
         res.json({ ...movie[0], reviews });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Erro ao buscar detalhes' });
     }
 };
