@@ -4,6 +4,8 @@ const app = express();
 const port = 3000;
 
 const apiRoutes = require('./routes/api');
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

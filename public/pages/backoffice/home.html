@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Backoffice - Gestão</title>
+    <link rel="stylesheet" href="../../css/global.css">
+    <style>
+        body { padding: 20px; background-color: #f4f4f4; color: #333; }
+        .panel { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        
+        /* Formulário */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background: #218838; }
+
+        /* Tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; }
+        .btn-delete { background: #dc3545; padding: 5px 10px; font-size: 0.8rem; }
+        .btn-delete:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <h1>🛠️ Área de Administração</h1>
+        <p>Bem-vindo, Admin! <a href="/" style="float:right">Ir para o Site</a></p>
+    </div>
+
+    <div class="panel">
+        <h2>Adicionar Novo Filme/Série</h2>
+        <form id="addForm">
+            <div class="form-group">
+                <label>Título:</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="form-group">
+                <label>Tipo:</label>
+                <select id="type">
+                    <option value="movie">Filme</option>
+                    <option value="serie">Série</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sinopse:</label>
+                <textarea id="synopsis" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>URL do Poster:</label>
+                <input type="text" id="poster_path" placeholder="https://...">
+            </div>
+            <button type="submit">Gravar Conteúdo</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h2>Gerir Conteúdos Existentes</h2>
+        <table id="tabelaConteudo">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Tipo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Carregar Tabela
+        async function carregarDados() {
+            const res = await fetch('/api/admin/contents');
+            
+            // Se der erro 401/403, chuta o user para fora
+            if (res.status === 401 || res.status === 403) {
+                alert('Não tens permissão!');
+                window.location.href = '/';
+                return;
+            }
+
+            const dados = await res.json();
+            const tbody = document.querySelector('#tabelaConteudo tbody');
+            tbody.innerHTML = '';
+
+            dados.forEach(filme => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${filme.id}</td>
+                    <td>${filme.title}</td>
+                    <td>${filme.type}</td>
+                    <td>
+                        <button class="btn-delete" onclick="apagarFilme(${filme.id})">Apagar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Adicionar Filme
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                title: document.getElementById('title').value,
+                type: document.getElementById('type').value,
+                synopsis: document.getElementById('synopsis').value,
+                poster_path: document.getElementById('poster_path').value
+            };
+
+            const res = await fetch('/api/admin/contents', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(dados)
+            });
+
+            if (res.ok) {
+                alert('Criado!');
+                carregarDados(); // Recarrega a tabela
+                e.target.reset();
+            } else {
+                alert('Erro ao criar.');
+            }
+        });
+
+        // Apagar Filme
+        async function apagarFilme(id) {
+            if(!confirm('Tens a certeza que queres apagar este filme?')) return;
+
+            const res = await fetch(`/api/admin/contents/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                carregarDados();
+            } else {
+                alert('Erro ao apagar');
+            }
+        }
+
+        // Iniciar
+        carregarDados();
+    </script>
+</body>
+</html>
