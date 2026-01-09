@@ -21,7 +21,7 @@ exports.addReview = async (req, res) => {
             return res.status(400).json({ error: 'Já fizeste uma review a este título!' });
         }
 
-        // Inserir Review
+        // Inserir Review (a data será automaticamente definida pelo DEFAULT CURRENT_TIMESTAMP)
         await db.query(
             'INSERT INTO reviews (user_id, content_id, rating, comment) VALUES (?, ?, ?, ?)',
             [user_id, content_id, rating, comment]
@@ -41,7 +41,21 @@ exports.voteUtility = async (req, res) => {
     const user_id = req.user.id;
 
     try {
-        // 1. Verificar se o user já votou nesta review
+        // 1. Verificar se a review pertence ao próprio utilizador
+        const [review] = await db.query(
+            'SELECT user_id FROM reviews WHERE id = ?',
+            [reviewId]
+        );
+
+        if (review.length === 0) {
+            return res.status(404).json({ error: 'Review não encontrada.' });
+        }
+
+        if (review[0].user_id === user_id) {
+            return res.status(400).json({ error: 'Não podes votar na tua própria review.' });
+        }
+
+        // 2. Verificar se o user já votou nesta review
         const [voted] = await db.query(
             'SELECT * FROM review_votes WHERE user_id = ? AND review_id = ?',
             [user_id, reviewId]
@@ -51,10 +65,10 @@ exports.voteUtility = async (req, res) => {
             return res.status(400).json({ error: 'Já votaste nesta review.' });
         }
 
-        // 2. Registar o voto na tabela de controlo
+        // 3. Registar o voto na tabela de controlo
         await db.query('INSERT INTO review_votes (user_id, review_id) VALUES (?, ?)', [user_id, reviewId]);
 
-        // 3. Incrementar o contador na tabela reviews
+        // 4. Incrementar o contador na tabela reviews
         await db.query('UPDATE reviews SET utility_counter = utility_counter + 1 WHERE id = ?', [reviewId]);
 
         res.json({ message: 'Voto registado!' });
