@@ -2,64 +2,221 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - CinePIS</title>
-    <link rel="stylesheet" href="../../css/global.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e50914',
+                        'primary-hover': '#f40612',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #222; color: white; }
-        .login-container { background: #333; padding: 40px; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; }
-        button:hover { background-color: #0056b3; }
-        .link { margin-top: 15px; font-size: 0.9rem; }
-        .link a { color: #f4c10f; text-decoration: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
     </style>
 </head>
-<body>
-
-    <div class="login-container">
-        <h2>🔐 Entrar</h2>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <script src="/js/loader.js"></script>
+    <main class="flex-1 flex items-center justify-center p-4">
+        <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-8 w-full max-w-md border border-gray-700 shadow-2xl animate-slide-up">
+        <h2 class="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent flex items-center justify-center gap-2">
+            <i class="bi bi-box-arrow-in-right"></i> Entrar
+        </h2>
         <form id="loginForm">
-            <input type="email" id="email" placeholder="O teu email" required>
-            <input type="password" id="password" placeholder="A tua password" required>
-            <button type="submit">Entrar</button>
+            <div class="mb-4">
+                <input type="email" id="email" placeholder="O teu email" required
+                       class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-all">
+            </div>
+            <div class="mb-4">
+                <input type="password" id="password" placeholder="A tua password" required
+                       class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-all">
+            </div>
+            <button type="submit" class="w-full px-4 py-3 bg-primary hover:bg-primary-hover rounded-lg font-semibold transition-all hover:scale-105 shadow-lg mb-4 flex items-center justify-center gap-2">
+                <i class="bi bi-box-arrow-in-right"></i> Entrar
+            </button>
         </form>
-        <div class="link">
-            Ainda não tens conta? <a href="register.html">Regista-te aqui</a>
+        
+        <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-600"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-gray-800 text-gray-400">ou</span>
+            </div>
+        </div>
+        
+        <button class="w-full px-4 py-3 bg-[#db4437] hover:bg-[#c23321] rounded-lg font-semibold transition-all hover:scale-105 mb-4 flex items-center justify-center gap-2" id="googleLoginBtn">
+            <i class="bi bi-google"></i> Entrar com Google
+        </button>
+        
+        <div class="text-center text-sm text-gray-400">
+            Ainda não tens conta?
+            <a href="register.html" class="text-primary hover:text-red-300 font-semibold underline decoration-white/20 hover:decoration-primary/60 transition-colors">Regista-te aqui</a>
+        </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-white/10 bg-black/40 backdrop-blur-xl">
+        <div class="container mx-auto px-4 py-8 max-w-md">
+            <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+                <div class="text-sm font-extrabold tracking-wide">
+                    <span class="text-white">CINE</span><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-300">PIS</span>
+                </div>
+                <div class="text-xs text-gray-500">© <span id="footerYear"></span></div>
+                </div>
+                <div class="text-xs text-gray-500 text-center">Desenvolvido por David Fernandes & João Rôlo & Sorin Revenco</div>
+            </div>
+        </div>
+        <script>document.getElementById('footerYear') && (document.getElementById('footerYear').textContent = new Date().getFullYear());</script>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl p-4 transform translate-y-[150%] transition-transform duration-300 z-50 max-w-sm w-[calc(100vw-2rem)]">
+        <div class="flex items-center gap-3">
+            <div id="toast-icon" class="text-2xl flex-shrink-0"></div>
+            <div class="min-w-0">
+                <p id="toast-message" class="font-semibold break-words"></p>
+            </div>
         </div>
     </div>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        try {
-            const res = await fetch('/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                // --- A MUDANÇA ESTÁ AQUI ---
-                // Guardamos o token no navegador
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user)); // Guardamos o nome tb para facilitar
-                
-                alert('Bem-vindo!');
-                window.location.href = '/'; 
-            } else {
-                alert('Erro: ' + data.error);
-            }
-        } catch (err) {
-            console.error(err);
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                info: 'ℹ'
+            };
+            
+            toastIcon.textContent = icons[type] || icons.info;
+            toastIcon.className = `text-2xl ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400'}`;
+            
+            toast.classList.remove('translate-y-[150%]');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[150%]');
+            }, 3000);
         }
-    });
-</script>
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showToast('Bem-vindo!', 'success');
+                    setTimeout(() => window.location.href = '/', 1000);
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('Erro ao fazer login. Tenta novamente.', 'error');
+            }
+        });
+
+        window.onload = async function() {
+            const btn = document.getElementById('googleLoginBtn');
+            if (!btn) return;
+
+            try {
+                const res = await fetch('/auth/google/client-id');
+                const data = await res.json();
+                const clientId = String(data.clientId || '').trim();
+
+                if (!clientId) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.title = 'Login com Google não configurado no servidor';
+                    return;
+                }
+
+                if (typeof google === 'undefined') {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.title = 'Google SDK não carregou';
+                    return;
+                }
+
+                google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: handleGoogleSignIn
+                });
+
+                btn.addEventListener('click', () => {
+                    google.accounts.id.prompt();
+                });
+            } catch (err) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.title = 'Erro ao inicializar login Google';
+            }
+        };
+
+        async function handleGoogleSignIn(response) {
+            try {
+                const res = await fetch('/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: response.credential })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showToast('Bem-vindo!', 'success');
+                    setTimeout(() => window.location.href = '/', 1000);
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('Erro ao fazer login com Google', 'error');
+            }
+        }
+    </script>
 </body>
 </html>
