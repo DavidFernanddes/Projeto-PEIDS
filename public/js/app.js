@@ -24,7 +24,7 @@ async function carregarFilmes() {
             const card = document.createElement('div');
             card.className = 'card';
             
-            const imagem = filme.poster_path ? filme.poster_path : 'https://via.placeholder.com/250x375?text=Sem+Imagem';
+            const imagem = filme.poster_path ? filme.poster_path : '/img/placeholder-poster.svg';
 
             // ATENÇÃO AO LINK NO HREF ABAIXO:
             // Agora aponta para pages/frontoffice/detalhes.html
