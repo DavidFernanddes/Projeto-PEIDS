@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CinePIS</title>
+    <link rel="stylesheet" href="../../css/global.css">
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #222; color: white; }
+        .login-container { background: #333; padding: 40px; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        .link { margin-top: 15px; font-size: 0.9rem; }
+        .link a { color: #f4c10f; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>🔐 Entrar</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="O teu email" required>
+            <input type="password" id="password" placeholder="A tua password" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <div class="link">
+            Ainda não tens conta? <a href="register.html">Regista-te aqui</a>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const res = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                // --- A MUDANÇA ESTÁ AQUI ---
+                // Guardamos o token no navegador
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user)); // Guardamos o nome tb para facilitar
+                
+                alert('Bem-vindo!');
+                window.location.href = '/'; 
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backoffice - CinePIS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e50914',
+                        'primary-hover': '#f40612',
+                        success: '#46d369',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Loading Screen -->
+    <div id="pageLoader" class="fixed inset-0 bg-gray-900 z-[9999] flex items-center justify-center transition-opacity duration-300">
+        <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+            <p class="text-xl text-gray-300">A carregar...</p>
+        </div>
+    </div>
+
+    <nav class="bg-black/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-800 shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-primary hover:scale-105 transition-transform flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+                CINE PIS
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/" class="text-gray-300 hover:text-white transition-all hover:scale-105 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Voltar ao Site
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 mb-8 border border-gray-700 shadow-2xl animate-fade-in">
+            <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent flex items-center gap-2">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Área de Administração
+            </h1>
+            <p class="text-gray-400">Bem-vindo, Admin! Gerencia aqui os conteúdos, utilizadores e reviews do sistema.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 border-b border-gray-700">
+            <button onclick="showTab('contents')" id="tab-contents" class="tab-btn px-6 py-3 font-semibold border-b-2 border-primary transition-all">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                Conteúdos
+            </button>
+            <button onclick="showTab('users')" id="tab-users" class="tab-btn px-6 py-3 font-semibold border-b-2 border-transparent text-gray-400 hover:text-white transition-all">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Utilizadores
+            </button>
+            <button onclick="showTab('reviews')" id="tab-reviews" class="tab-btn px-6 py-3 font-semibold border-b-2 border-transparent text-gray-400 hover:text-white transition-all">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                Reviews
+            </button>
+        </div>
+
+        <!-- Tab: Conteúdos -->
+        <div id="tab-contents-content" class="tab-content">
+            <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 mb-8 border border-gray-700 shadow-2xl animate-slide-up">
+                <h2 class="text-2xl font-semibold mb-6 border-b-2 border-primary pb-2">Adicionar Novo Filme/Série</h2>
+                <form id="addForm">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Título:</label>
+                        <input type="text" id="title" required
+                               class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-all">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Tipo:</label>
+                        <select id="type" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-all">
+                            <option value="movie">Filme</option>
+                            <option value="series">Série</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Sinopse:</label>
+                        <textarea id="synopsis" rows="3"
+                                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-all resize-none"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">URL do Poster:</label>
+                        <input type="text" id="poster_path" placeholder="https://..."
+                               class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-all">
+                    </div>
+                    <button type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-all hover:scale-105 shadow-lg font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Gravar Conteúdo
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-slide-up">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold border-b-2 border-primary pb-2">Gerir Conteúdos Existentes</h2>
+                    <div class="flex gap-2">
+                        <button onclick="filterContents('all')" id="filterAll" class="px-4 py-2 bg-primary rounded-lg hover:bg-primary-hover transition-all hover:scale-105 font-semibold text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            Todos
+                        </button>
+                        <button onclick="filterContents('movie')" id="filterMovie" class="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-all hover:scale-105 font-semibold text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            Filmes
+                        </button>
+                        <button onclick="filterContents('series')" id="filterSeries" class="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-all hover:scale-105 font-semibold text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Séries
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th class="px-4 py-3 text-left">ID</th>
+                                <th class="px-4 py-3 text-left">Título</th>
+                                <th class="px-4 py-3 text-left">Tipo</th>
+                                <th class="px-4 py-3 text-left">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaConteudo">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Utilizadores -->
+        <div id="tab-users-content" class="tab-content hidden">
+            <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-slide-up">
+                <h2 class="text-2xl font-semibold mb-6 border-b-2 border-primary pb-2">Gerir Utilizadores</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th class="px-4 py-3 text-left">ID</th>
+                                <th class="px-4 py-3 text-left">Nome</th>
+                                <th class="px-4 py-3 text-left">Email</th>
+                                <th class="px-4 py-3 text-left">Role</th>
+                                <th class="px-4 py-3 text-left">Reviews</th>
+                                <th class="px-4 py-3 text-left">Favoritos</th>
+                                <th class="px-4 py-3 text-left">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaUsers">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Reviews -->
+        <div id="tab-reviews-content" class="tab-content hidden">
+            <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-slide-up">
+                <h2 class="text-2xl font-semibold mb-6 border-b-2 border-primary pb-2">Gerir Reviews</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th class="px-4 py-3 text-left">ID</th>
+                                <th class="px-4 py-3 text-left">Utilizador</th>
+                                <th class="px-4 py-3 text-left">Conteúdo</th>
+                                <th class="px-4 py-3 text-left">Rating</th>
+                                <th class="px-4 py-3 text-left">Comentário</th>
+                                <th class="px-4 py-3 text-left">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaReviews">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="deleteContentModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center animate-fade-in">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 border border-gray-700 shadow-2xl animate-slide-up">
+            <div class="text-center mb-6">
+                <div class="mx-auto w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Apagar Conteúdo?</h3>
+                <p class="text-gray-400">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteContentModal()" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-all hover:scale-105 font-semibold">Cancelar</button>
+                <button onclick="confirmDeleteContent()" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-all hover:scale-105 font-semibold">Apagar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteUserModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center animate-fade-in">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 border border-gray-700 shadow-2xl animate-slide-up">
+            <div class="text-center mb-6">
+                <div class="mx-auto w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Apagar Utilizador?</h3>
+                <p class="text-gray-400">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteUserModal()" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-all hover:scale-105 font-semibold">Cancelar</button>
+                <button onclick="confirmDeleteUser()" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-all hover:scale-105 font-semibold">Apagar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteReviewModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center animate-fade-in">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 border border-gray-700 shadow-2xl animate-slide-up">
+            <div class="text-center mb-6">
+                <div class="mx-auto w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Apagar Review?</h3>
+                <p class="text-gray-400">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteReviewModal()" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-all hover:scale-105 font-semibold">Cancelar</button>
+                <button onclick="confirmDeleteReview()" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-all hover:scale-105 font-semibold">Apagar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl p-4 transform translate-y-[150%] transition-transform duration-300 z-50 max-w-sm w-[calc(100vw-2rem)]">
+        <div class="flex items-center gap-3">
+            <div id="toast-icon" class="text-2xl flex-shrink-0"></div>
+            <div class="min-w-0">
+                <p id="toast-message" class="font-semibold break-words"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Não estás logado!');
+            window.location.href = '/pages/auth/login.html';
+        }
+
+        let currentFilter = 'all';
+        let itemToDelete = null;
+        let deleteType = null;
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                info: 'ℹ'
+            };
+            
+            toastIcon.textContent = icons[type] || icons.info;
+            toastIcon.className = `text-2xl ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400'}`;
+            
+            toast.classList.remove('translate-y-[150%]');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[150%]');
+            }, 3000);
+        }
+
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            };
+        }
+
+        function showTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-primary', 'text-white');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+
+            // Show selected tab
+            document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
+            const btn = document.getElementById(`tab-${tab}`);
+            btn.classList.add('border-primary', 'text-white');
+            btn.classList.remove('border-transparent', 'text-gray-400');
+
+            // Load data
+            if (tab === 'contents') carregarDados();
+            else if (tab === 'users') carregarUsers();
+            else if (tab === 'reviews') carregarReviews();
+        }
+
+        function filterContents(type) {
+            currentFilter = type;
+            
+            document.querySelectorAll('#filterAll, #filterMovie, #filterSeries').forEach(btn => {
+                btn.classList.remove('bg-primary', 'hover:bg-primary-hover');
+                btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+            });
+            
+            const btn = document.getElementById(`filter${type === 'all' ? 'All' : type === 'movie' ? 'Movie' : 'Series'}`);
+            btn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+            btn.classList.add('bg-primary', 'hover:bg-primary-hover');
+            
+            carregarDados();
+        }
+
+        async function carregarDados() {
+            try {
+                const url = currentFilter === 'all' 
+                    ? '/api/admin/contents' 
+                    : `/api/admin/contents?type=${currentFilter}`;
+                    
+                const res = await fetch(url, { headers: getAuthHeaders() });
+                
+                if (res.status === 401 || res.status === 403) {
+                    showToast('Não tens permissão!', 'error');
+                    setTimeout(() => window.location.href = '/', 2000);
+                    return;
+                }
+
+                if (!res.ok) throw new Error('Erro ao carregar dados');
+
+                const dados = await res.json();
+                const tbody = document.querySelector('#tabelaConteudo');
+                tbody.innerHTML = '';
+
+                if (dados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">Nenhum conteúdo encontrado.</td></tr>';
+                    return;
+                }
+
+                dados.forEach((filme, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-700 hover:bg-gray-700/50 transition-colors animate-slide-up';
+                    tr.style.animationDelay = `${index * 0.05}s`;
+                    tr.innerHTML = `
+                        <td class="px-4 py-3">${filme.id}</td>
+                        <td class="px-4 py-3">${filme.title}</td>
+                        <td class="px-4 py-3">${filme.type}</td>
+                        <td class="px-4 py-3">
+                            <button class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-lg text-sm transition-all hover:scale-105 font-semibold flex items-center gap-2" onclick="showDeleteContentModal(${filme.id})">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Apagar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao carregar dados: ' + error.message, 'error');
+            }
+        }
+
+        async function carregarUsers() {
+            try {
+                const res = await fetch('/api/admin/users', { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error('Erro ao carregar utilizadores');
+
+                const dados = await res.json();
+                const tbody = document.querySelector('#tabelaUsers');
+                tbody.innerHTML = '';
+
+                if (dados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">Nenhum utilizador encontrado.</td></tr>';
+                    return;
+                }
+
+                dados.forEach((user, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-700 hover:bg-gray-700/50 transition-colors animate-slide-up';
+                    tr.style.animationDelay = `${index * 0.05}s`;
+                    tr.innerHTML = `
+                        <td class="px-4 py-3">${user.id}</td>
+                        <td class="px-4 py-3">${user.name}</td>
+                        <td class="px-4 py-3">${user.email}</td>
+                        <td class="px-4 py-3">
+                            <select onchange="updateUserRole(${user.id}, this.value)" class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm" ${user.role === 'admin' ? 'disabled' : ''}>
+                                <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        </td>
+                        <td class="px-4 py-3">${user.review_count || 0}</td>
+                        <td class="px-4 py-3">${user.favorite_count || 0}</td>
+                        <td class="px-4 py-3">
+                            ${user.role !== 'admin' ? `
+                                <button class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-lg text-sm transition-all hover:scale-105 font-semibold flex items-center gap-2" onclick="showDeleteUserModal(${user.id})">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Apagar
+                                </button>
+                            ` : '<span class="text-gray-500 text-sm">N/A</span>'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao carregar utilizadores: ' + error.message, 'error');
+            }
+        }
+
+        async function carregarReviews() {
+            try {
+                const res = await fetch('/api/admin/reviews', { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error('Erro ao carregar reviews');
+
+                const dados = await res.json();
+                const tbody = document.querySelector('#tabelaReviews');
+                tbody.innerHTML = '';
+
+                if (dados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">Nenhuma review encontrada.</td></tr>';
+                    return;
+                }
+
+                dados.forEach((review, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-700 hover:bg-gray-700/50 transition-colors animate-slide-up';
+                    tr.style.animationDelay = `${index * 0.05}s`;
+                    const commentPreview = review.comment.length > 50 ? review.comment.substring(0, 50) + '...' : review.comment;
+                    tr.innerHTML = `
+                        <td class="px-4 py-3">${review.id}</td>
+                        <td class="px-4 py-3">${review.user_name} (${review.user_email})</td>
+                        <td class="px-4 py-3">${review.content_title}</td>
+                        <td class="px-4 py-3">${review.rating}/10</td>
+                        <td class="px-4 py-3" title="${review.comment}">${commentPreview}</td>
+                        <td class="px-4 py-3">
+                            <button class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-lg text-sm transition-all hover:scale-105 font-semibold flex items-center gap-2" onclick="showDeleteReviewModal(${review.id})">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Apagar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao carregar reviews: ' + error.message, 'error');
+            }
+        }
+
+        function showDeleteContentModal(id) {
+            itemToDelete = id;
+            deleteType = 'content';
+            document.getElementById('deleteContentModal').classList.remove('hidden');
+            document.getElementById('deleteContentModal').classList.add('flex');
+        }
+
+        function closeDeleteContentModal() {
+            document.getElementById('deleteContentModal').classList.add('hidden');
+            document.getElementById('deleteContentModal').classList.remove('flex');
+            itemToDelete = null;
+        }
+
+        function showDeleteUserModal(id) {
+            itemToDelete = id;
+            deleteType = 'user';
+            document.getElementById('deleteUserModal').classList.remove('hidden');
+            document.getElementById('deleteUserModal').classList.add('flex');
+        }
+
+        function closeDeleteUserModal() {
+            document.getElementById('deleteUserModal').classList.add('hidden');
+            document.getElementById('deleteUserModal').classList.remove('flex');
+            itemToDelete = null;
+        }
+
+        function showDeleteReviewModal(id) {
+            itemToDelete = id;
+            deleteType = 'review';
+            document.getElementById('deleteReviewModal').classList.remove('hidden');
+            document.getElementById('deleteReviewModal').classList.add('flex');
+        }
+
+        function closeDeleteReviewModal() {
+            document.getElementById('deleteReviewModal').classList.add('hidden');
+            document.getElementById('deleteReviewModal').classList.remove('flex');
+            itemToDelete = null;
+        }
+
+        async function confirmDeleteContent() {
+            try {
+                const res = await fetch(`/api/admin/contents/${itemToDelete}`, { 
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                
+                if (res.ok) {
+                    showToast('Apagado com sucesso!', 'success');
+                    closeDeleteContentModal();
+                    carregarDados();
+                } else {
+                    const data = await res.json();
+                    showToast('Erro: ' + (data.error || 'Erro desconhecido'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao apagar: ' + error.message, 'error');
+            }
+        }
+
+        async function confirmDeleteUser() {
+            try {
+                const res = await fetch(`/api/admin/users/${itemToDelete}`, { 
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                
+                if (res.ok) {
+                    showToast('Utilizador apagado com sucesso!', 'success');
+                    closeDeleteUserModal();
+                    carregarUsers();
+                } else {
+                    const data = await res.json();
+                    showToast('Erro: ' + (data.error || 'Erro desconhecido'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao apagar: ' + error.message, 'error');
+            }
+        }
+
+        async function confirmDeleteReview() {
+            try {
+                const res = await fetch(`/api/admin/reviews/${itemToDelete}`, { 
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                
+                if (res.ok) {
+                    showToast('Review apagada com sucesso!', 'success');
+                    closeDeleteReviewModal();
+                    carregarReviews();
+                } else {
+                    const data = await res.json();
+                    showToast('Erro: ' + (data.error || 'Erro desconhecido'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao apagar: ' + error.message, 'error');
+            }
+        }
+
+        async function updateUserRole(userId, newRole) {
+            try {
+                const res = await fetch(`/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (res.ok) {
+                    showToast('Role atualizado com sucesso!', 'success');
+                } else {
+                    const data = await res.json();
+                    showToast('Erro: ' + (data.error || 'Erro desconhecido'), 'error');
+                    carregarUsers(); // Reload to reset
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao atualizar role: ' + error.message, 'error');
+                carregarUsers(); // Reload to reset
+            }
+        }
+
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                title: document.getElementById('title').value,
+                type: document.getElementById('type').value,
+                synopsis: document.getElementById('synopsis').value,
+                poster_path: document.getElementById('poster_path').value
+            };
+
+            try {
+                const res = await fetch('/api/admin/contents', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(dados)
+                });
+
+                if (res.ok) {
+                    showToast('Criado com sucesso!', 'success');
+                    carregarDados();
+                    e.target.reset();
+                } else {
+                    const data = await res.json();
+                    showToast('Erro ao criar: ' + (data.error || 'Erro desconhecido'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao criar: ' + error.message, 'error');
+            }
+        });
+
+        // Hide page loader when content is ready
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('pageLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 300);
+                }
+            }, 500);
+        });
+
+        // Initialize
+        showTab('contents');
+    </script>
+</body>
+</html>
+
+</html>

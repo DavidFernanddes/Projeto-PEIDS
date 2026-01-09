@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registo - CinePIS</title>
+    <link rel="stylesheet" href="../../css/global.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #141414; color: white; margin: 0;}
+        .login-container { background: #333; padding: 40px; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #e50914; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #f40612; }
+        .link { margin-top: 15px; font-size: 0.9rem; color: #aaa; }
+        .link a { color: white; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>📝 Criar Conta</h2>
+        <form id="registerForm">
+            <input type="text" id="name" placeholder="O teu Nome" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Registar</button>
+        </form>
+        <div class="link">
+            Já tens conta? <a href="login.html">Faz Login aqui</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Buscar valores
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Enviar para o servidor
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert('Conta criada com sucesso! Podes fazer login.');
+                    window.location.href = 'login.html'; // Redireciona para o login
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao tentar registar.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -2,124 +2,282 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes</title>
-    <!-- ATENÇÃO AOS PATHS: ../../ para voltar à raiz do public -->
+    <title>Detalhes do Filme</title>
     <link rel="stylesheet" href="../../css/global.css">
     <style>
-        /* CSS temporario */
-        body { font-family: sans-serif; background: #222; color: white; padding: 20px; }
-        .container { 
-            max-width: 900px; 
-            margin: 40px auto; 
-            background: #333; 
-            padding: 30px; 
-            border-radius: 10px; 
+        body { font-family: sans-serif; background-color: #121212; margin: 0; color: #e0e0e0; }
+        
+        /* Navbar */
+        nav { background: #000; padding: 15px; border-bottom: 1px solid #333; }
+        nav a { color: white; text-decoration: none; font-weight: bold; }
+
+        /* Container Principal */
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+
+        /* Info do Filme */
+        #filme-info { 
             display: flex; 
             gap: 30px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: #1f1f1f; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-        .poster-container img { 
-            width: 300px; 
-            border-radius: 10px; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        .info { flex: 1; display: flex; flex-direction: column; justify-content: center;}
-        h1 { margin-top: 0; color: #f4c10f; font-size: 2.5rem; margin-bottom: 10px; }
-        .meta { color: #aaa; margin-bottom: 20px; font-size: 0.9rem; }
-        .rating { font-size: 1.2rem; margin-bottom: 20px; color: #fff; }
-        .rating span { color: #f4c10f; font-weight: bold; }
-        .sinopse { line-height: 1.6; color: #ddd; margin-bottom: 30px; }
+        #poster { width: 250px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+        h1 { margin-top: 0; color: #fff; }
         
-        .btn { 
-            display: inline-block; 
-            padding: 12px 25px; 
-            background: #007bff; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold;
-            text-align: center;
-            width: fit-content;
-            transition: background 0.3s;
+        /* Botão Favoritos */
+        #btnFav {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #e50914;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
         }
-        .btn:hover { background: #0056b3; }
+        #btnFav:hover { background: rgba(229, 9, 20, 0.1); }
 
-        /* Responsive */
-        @media (max-width: 700px) {
-            .container { flex-direction: column; align-items: center; }
-            .info { text-align: center; align-items: center; }
+        /* Reviews */
+        .review-section { margin-top: 40px; background: #fff; color: #333; padding: 25px; border-radius: 8px; }
+        .review-card { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .review-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;}
+        .stars { color: #f4c10f; }
+        
+        .utility-btn { 
+            background: #f0f0f0; 
+            border: 1px solid #ccc; 
+            padding: 5px 12px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+            margin-top: 5px;
         }
+        .utility-btn:hover { background: #e0e0e0; }
+
+        /* Formulário */
+        #form-review-container { background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;}
+        input, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button[type="submit"] { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button[type="submit"]:hover { background: #0056b3; }
     </style>
 </head>
 <body>
+    <nav>
+        <a href="/">⬅ Voltar à Home</a>
+    </nav>
 
-    <div id="loading" style="text-align: center; margin-top: 50px;">A carregar filme...</div>
-    
-    <div id="filme-detalhe" class="container" style="display: none;">
-        <!-- Imagem à esquerda -->
-        <div class="poster-container">
+    <div class="container">
+        <div id="filme-info">
             <img id="poster" src="" alt="Poster">
+            <div style="flex: 1;">
+                <h1 id="titulo">Carregando...</h1>
+                <p id="sinopse" style="line-height: 1.6; color: #bbb;"></p>
+                <p><strong>Lançamento:</strong> <span id="data"></span></p>
+                <p><strong>Rating Geral:</strong> ⭐ <span id="rating"></span></p>
+                
+                <button id="btnFav" onclick="toggleFav()" style="display: none;">
+                    🤍 Adicionar aos Favoritos
+                </button>
+            </div>
         </div>
-        
-        <!-- Texto à direita -->
-        <div class="info">
-            <h1 id="titulo">Titulo do Filme</h1>
+
+        <div class="review-section">
+            <h2>📝 Reviews & Críticas</h2>
             
-            <div class="meta">
-                Lançado em: <span id="data"></span> | Tipo: <span id="tipo"></span>
+            <div id="login-warning" style="display: none; color: #555; background: #eee; padding: 15px; border-radius: 5px;">
+                🔒 <a href="/pages/auth/login.html" style="color: #007bff; font-weight: bold;">Faz login</a> para escreveres reviews ou marcar favoritos.
             </div>
 
-            <div class="rating">
-                Classificação: <span>⭐ <span id="nota"></span>/10</span>
+            <div id="form-review-container" style="display: none;">
+                <h3 style="margin-top: 0;">Deixa a tua opinião</h3>
+                <form id="reviewForm">
+                    <label>Classificação (1-10):</label>
+                    <input type="number" id="userRating" min="1" max="10" required style="width: 60px;">
+                    <br><br>
+                    <label>Comentário:</label><br>
+                    <textarea id="userComment" rows="3" style="width: 100%; box-sizing: border-box;" required></textarea>
+                    <br><br>
+                    <button type="submit">Publicar Review</button>
+                </form>
             </div>
 
-            <p id="sinopse">A sinopse vai aqui...</p>
-            
-            <!-- Botão para voltar ao início -->
-            <a href="/" class="btn">⬅ Voltar à Lista</a>
+            <div id="lista-reviews">
+                <p>A carregar reviews...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Lógica simples apenas para esta página
-        async function carregarDetalhes() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
+        const params = new URLSearchParams(window.location.search);
+        const idFilme = params.get('id');
 
-            if (!id) {
-                document.body.innerHTML = '<h1 style="text-align:center; margin-top:50px">Erro: Nenhum filme selecionado</h1>';
-                return;
+        // Função Principal
+        async function carregarPagina() {
+            if(!idFilme) return alert('ID não fornecido');
+
+            // 1. Verificar Token no LocalStorage
+            const token = localStorage.getItem('token');
+            const isLoggedIn = !!token; // Converte para boolean (true se existir token)
+
+            // Mostrar/Esconder elementos baseados no login
+            if (isLoggedIn) {
+                document.getElementById('form-review-container').style.display = 'block';
+                document.getElementById('btnFav').style.display = 'inline-block';
+            } else {
+                document.getElementById('login-warning').style.display = 'block';
             }
 
+            // 2. Carregar Dados do Filme (Público)
             try {
-                // O fetch funciona na mesma porque o /api é absoluto
-                const res = await fetch(`/api/filmes/${id}`);
+                const res = await fetch(`/api/filmes/${idFilme}`);
+                if (!res.ok) throw new Error("Filme não encontrado");
                 
-                if (!res.ok) throw new Error('Filme não encontrado');
+                const dados = await res.json();
                 
-                const filme = await res.json();
+                // Preencher HTML
+                document.getElementById('titulo').innerText = dados.title;
+                document.getElementById('sinopse').innerText = dados.synopsis || "Sem sinopse.";
+                document.getElementById('data').innerText = dados.release_date ? new Date(dados.release_date).toLocaleDateString('pt-PT') : 'N/A';
+                document.getElementById('rating').innerText = Number(dados.vote_average).toFixed(1);
+                document.getElementById('poster').src = dados.poster_path;
 
-                // Preencher dados
-                document.getElementById('titulo').innerText = filme.title;
-                document.getElementById('sinopse').innerText = filme.synopsis || "Sem sinopse disponível.";
-                document.getElementById('data').innerText = filme.release_date ? new Date(filme.release_date).toLocaleDateString() : 'N/A';
-                document.getElementById('nota').innerText = filme.vote_average;
-                document.getElementById('tipo').innerText = filme.type === 'movie' ? 'Filme' : 'Série';
-                
-                const imagem = filme.poster_path ? filme.poster_path : 'https://via.placeholder.com/300x450?text=Sem+Poster';
-                document.getElementById('poster').src = imagem;
+                // 3. Se estiver logado, verificar se é favorito
+                if (isLoggedIn) {
+                    verificarSeEFavorito(token);
+                }
 
-                // Mostrar
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('filme-detalhe').style.display = 'flex';
+                // 4. Carregar Reviews
+                renderizarReviews(dados.reviews, isLoggedIn);
 
             } catch (erro) {
-                document.body.innerHTML = `<h1 style="text-align:center">Erro: ${erro.message}</h1>`;
+                document.body.innerHTML = `<h1 style="color:white; text-align:center; margin-top:50px">${erro.message}</h1>`;
             }
         }
 
-        carregarDetalhes();
+        // Renderizar lista de reviews
+        function renderizarReviews(reviews, isLoggedIn) {
+            const lista = document.getElementById('lista-reviews');
+            lista.innerHTML = '';
+
+            if (!reviews || reviews.length === 0) {
+                lista.innerHTML = '<p>Ainda não há reviews. Sê o primeiro!</p>';
+                return;
+            }
+
+            reviews.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'review-card';
+                div.innerHTML = `
+                    <div class="review-header">
+                        <span>👤 ${r.user_name}</span>
+                        <span class="stars">⭐ ${r.rating}/10</span>
+                    </div>
+                    <p>${r.comment}</p>
+                    <small style="color: #666;">Útil: <span id="count-${r.id}">${r.utility_counter}</span> pessoas acharam útil</small>
+                    ${isLoggedIn ? `<br><button class="utility-btn" onclick="votarUtil(${r.id})">👍 Isto é útil</button>` : ''}
+                `;
+                lista.appendChild(div);
+            });
+        }
+
+        // --- FUNCIONALIDADE FAVORITOS (JWT) ---
+        async function verificarSeEFavorito(token) {
+            try {
+                const res = await fetch(`/api/favorites/check/${idFilme}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                atualizarBotaoVisual(data.isFavorite);
+            } catch (e) { console.error("Erro favorito:", e); }
+        }
+
+        async function toggleFav() {
+            const token = localStorage.getItem('token');
+            if(!token) return window.location.href = '/pages/auth/login.html';
+
+            const res = await fetch('/api/favorites/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token // Token JWT
+                },
+                body: JSON.stringify({ contentId: idFilme })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                atualizarBotaoVisual(data.isFavorite);
+            } else {
+                alert('Sessão expirada. Faz login novamente.');
+            }
+        }
+
+        function atualizarBotaoVisual(isFav) {
+            const btn = document.getElementById('btnFav');
+            if (isFav) {
+                btn.innerHTML = '❤️ Remover dos Favoritos';
+                btn.style.backgroundColor = '#e50914';
+                btn.style.borderColor = '#e50914';
+            } else {
+                btn.innerHTML = '🤍 Adicionar aos Favoritos';
+                btn.style.backgroundColor = 'transparent';
+                btn.style.borderColor = '#e50914';
+            }
+        }
+
+        // --- FUNCIONALIDADE REVIEWS (JWT) ---
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            if(!token) return alert('Tens de estar logado!');
+
+            const rating = document.getElementById('userRating').value;
+            const comment = document.getElementById('userComment').value;
+
+            const res = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token // Token JWT
+                },
+                body: JSON.stringify({ content_id: idFilme, rating, comment })
+            });
+
+            const resposta = await res.json();
+
+            if (res.ok) {
+                alert('Obrigado pela tua review!');
+                location.reload();
+            } else {
+                alert('Erro: ' + resposta.error);
+            }
+        });
+
+        // --- FUNCIONALIDADE VOTAR ÚTIL (JWT) ---
+        async function votarUtil(reviewId) {
+            const token = localStorage.getItem('token');
+            if(!token) return alert('Login necessário');
+
+            const res = await fetch(`/api/reviews/${reviewId}/vote`, { 
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token } // Token JWT
+            });
+            
+            if (res.ok) {
+                alert('Voto registado!');
+                const span = document.getElementById(`count-${reviewId}`);
+                span.innerText = parseInt(span.innerText) + 1;
+            } else {
+                const err = await res.json();
+                alert(err.error);
+            }
+        }
+
+        // Iniciar tudo
+        carregarPagina();
     </script>
 </body>
 </html>
