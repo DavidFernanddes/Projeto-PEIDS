@@ -1,36 +1,67 @@
+/**
+ * app.js
+ * 
+ * Ficheiro principal da aplicação Express.js
+ * Configura middleware, rotas e inicia o servidor HTTP
+ * 
+ * @author David Fernandes, João Rôlo & Sorin Revenco
+ * @version 1.0
+ * @date 2026
+ */
+
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
+const cors = require('cors');
 
-// Carregar variáveis de ambiente
+// Carregar variáveis de ambiente do ficheiro .env
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- 1. MIDDLEWARE (A PARTE QUE TE FALTA/ESTÁ MAL) ---
-// Estas linhas têm de estar ANTES das rotas!
-app.use(express.json()); // Permite ler JSON (req.body)
-app.use(express.urlencoded({ extended: true })); // Permite ler formulários normais
+// ============================================
+// MIDDLEWARE
+// ============================================
 
-// --- 3. FICHEIROS ESTÁTICOS (CSS, IMAGENS, JS) ---
+// CORS: Permitir requisições de diferentes origens (útil para desenvolvimento)
+app.use(cors());
+
+// JSON Parser: Permite ler dados JSON no req.body
+app.use(express.json());
+
+// URL Encoded Parser: Permite ler formulários HTML (application/x-www-form-urlencoded)
+app.use(express.urlencoded({ extended: true }));
+
+// ============================================
+// FICHEIROS ESTÁTICOS
+// ============================================
+// Servir ficheiros estáticos (CSS, imagens, JS, HTML) da pasta public/
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- 4. ROTAS ---
-const apiRoutes = require('./routes/api');
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin'); // Se já tiveres o backoffice
+// ============================================
+// ROTAS
+// ============================================
 
-app.use('/api', apiRoutes);
-app.use('/auth', authRoutes);
-app.use('/api/admin', adminRoutes); // Rota do backoffice
+// Importar módulos de rotas
+const apiRoutes = require('./routes/api');      // Rotas da API REST
+const authRoutes = require('./routes/auth');    // Rotas de autenticação
+const adminRoutes = require('./routes/admin');  // Rotas administrativas (backoffice)
 
-// Rota para a raiz (opcional, mas boa prática)
+// Registrar rotas
+app.use('/api', apiRoutes);           // API REST: /api/*
+app.use('/auth', authRoutes);         // Autenticação: /auth/*
+app.use('/api/admin', adminRoutes);   // Backoffice: /api/admin/*
+
+// Rota raiz: servir página inicial
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// --- 5. INICIAR SERVIDOR ---
+// ============================================
+// INICIAR SERVIDOR
+// ============================================
 app.listen(PORT, () => {
     console.log(`Servidor a correr em http://localhost:${PORT}`);
+    console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
 });

@@ -22,26 +22,6 @@
             }
         }
     </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backoffice - CinePIS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#e50914',
-                        'primary-hover': '#f40612',
-                        success: '#46d369',
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -202,31 +182,7 @@
                         </tbody>
                     </table>
                 </div>
-        </div>
-
-        <!-- Tab: Utilizadores -->
-        <div id="tab-users-content" class="tab-content hidden">
-            <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-slide-up">
-                <h2 class="text-2xl font-semibold mb-6 border-b-2 border-primary pb-2">Gerir Utilizadores</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-primary">
-                                <th class="px-4 py-3 text-left">ID</th>
-                                <th class="px-4 py-3 text-left">Nome</th>
-                                <th class="px-4 py-3 text-left">Email</th>
-                                <th class="px-4 py-3 text-left">Role</th>
-                                <th class="px-4 py-3 text-left">Reviews</th>
-                                <th class="px-4 py-3 text-left">Favoritos</th>
-                                <th class="px-4 py-3 text-left">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaUsers">
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </div>
         </div>
 
         <!-- Tab: Reviews -->
