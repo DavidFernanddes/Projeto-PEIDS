@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes - CinePIS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e50914',
+                        'primary-hover': '#f40612',
+                        success: '#46d369',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <script src="/js/loader.js"></script>
+    <!-- Loading Screen -->
+    <div id="pageLoader" class="fixed inset-0 bg-gray-900 z-[9999] flex items-center justify-center transition-opacity duration-300">
+        <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+            <p class="text-xl text-gray-300">A carregar...</p>
+        </div>
+    </div>
+
+    <nav class="bg-black/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-800 shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center gap-6">
+            <div class="flex items-center gap-6">
+            <a href="/" class="group flex items-center select-none">
+                <span class="leading-tight transition-all duration-200 group-hover:scale-[1.02] group-hover:brightness-110">
+                    <span class="block text-lg sm:text-xl font-extrabold tracking-wide">
+                        <span class="text-white">CINE</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-300">PIS</span>
+                    </span>
+                    <span class="hidden sm:block text-xs text-gray-400 -mt-0.5">Filmes & Séries</span>
+                </span>
+            </a>
+            <div class="hidden md:flex items-center gap-2">
+                <a href="/pages/frontoffice/atores.html" class="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 transition-colors text-sm font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Atores
+                </a>
+                <a href="/pages/frontoffice/diretores.html" class="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 transition-colors text-sm font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    Diretores
+                </a>
+            </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="/" class="text-gray-300 hover:text-white transition-all hover:scale-105 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Voltar
+                </a>
+                <div id="nav-menu" class="flex items-center gap-4"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div id="filme-info" class="relative z-20 bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 md:p-8 mb-8 border border-gray-700 flex flex-col md:flex-row gap-6 shadow-2xl animate-fade-in">
+            <div class="w-full md:w-64 flex-shrink-0">
+                <img id="poster" src="" alt="Poster" class="w-full rounded-lg shadow-2xl object-contain bg-gray-900">
+            </div>
+            <div class="flex-1">
+                <h1 id="titulo" class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Carregando...</h1>
+                <p id="sinopse" class="text-gray-300 mb-4 leading-relaxed"></p>
+                <div class="space-y-2 text-sm mb-6">
+                    <p><strong class="text-gray-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Lançamento:</strong> <span id="data"></span></p>
+                    <p><strong class="text-gray-400 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        Rating Geral:</strong> <span id="rating" class="text-success font-bold"></span></p>
+                    <p><strong class="text-gray-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        Géneros:</strong> <span id="genres"></span></p>
+                    <p><strong class="text-gray-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Diretor/Criador:</strong> <span id="directors"></span></p>
+                    <p><strong class="text-gray-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Elenco Principal:</strong> <span id="actors"></span></p>
+                </div>
+                
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <button id="btnFav" onclick="toggleFav()" class="px-6 py-2.5 bg-primary hover:bg-primary-hover rounded-lg transition-all hover:scale-105 shadow-lg font-semibold flex items-center gap-2 hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        Adicionar aos Favoritos
+                    </button>
+                    
+                    <button id="btnTrailer" onclick="openTrailer()" class="px-6 py-2.5 bg-primary hover:bg-primary-hover rounded-lg transition-all hover:scale-105 shadow-lg font-semibold flex items-center gap-2 hidden">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path></svg>
+                        Ver Trailer
+                    </button>
+                    
+                    <!-- Botão de adicionar à lista sempre visível -->
+                    <div class="relative group">
+                        <button onclick="toggleListDropdown()" class="px-6 py-2.5 bg-primary hover:bg-primary-hover rounded-lg transition-all hover:scale-105 shadow-lg font-semibold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            Adicionar à Lista
+                        </button>
+                        
+                        <!-- Dropdown -->
+                        <div id="listDropdown" class="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-2xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
+                            <div id="listDropdownContent" class="p-2">
+                                <p class="text-gray-400 text-sm p-2">A carregar listas...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar & Recommendations -->
+        <div id="tmdb-sections" class="space-y-8 mb-8 relative z-10"></div>
+
+        <div class="relative z-10 bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-fade-in">
+            <h2 class="text-2xl font-bold mb-6 border-b-2 border-primary pb-2 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                Reviews e Críticas
+            </h2>
+            
+            <div id="login-warning" class="bg-blue-900/30 border border-blue-700 text-blue-300 px-4 py-3 rounded-lg mb-6 hidden animate-slide-up flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <a href="/pages/auth/login.html" class="font-bold underline hover:text-blue-200">Faz login</a> para escreveres reviews ou marcar favoritos.
+            </div>
+
+            <div id="form-review-container" class="bg-gray-700/50 rounded-lg p-6 mb-6 hidden animate-slide-up">
+                <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Deixa a tua opinião
+                </h3>
+                <form id="reviewForm">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Classificação:</label>
+                        <div id="starRating" class="flex gap-1 mb-2 flex-wrap"></div>
+                        <input type="hidden" id="userRating" required>
+                        <span id="ratingDisplay" class="text-sm text-gray-400">Seleciona uma classificação</span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Comentário:</label>
+                        <textarea id="userComment" rows="4" required class="w-full px-4 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-primary resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-all hover:scale-105 shadow-lg font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        Publicar Review
+                    </button>
+                </form>
+            </div>
+
+            <div id="lista-reviews" class="space-y-4">
+                <p class="text-gray-400 animate-pulse">A carregar reviews...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Trailer -->
+    <div id="trailerModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden items-center justify-center animate-fade-in">
+        <div class="relative w-full max-w-4xl mx-4 animate-slide-up">
+            <button onclick="closeTrailer()" class="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="aspect-video bg-black rounded-lg overflow-hidden">
+                <iframe id="trailerFrame" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para criar lista -->
+    <div id="createListModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center animate-fade-in">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 border border-gray-700 shadow-2xl animate-slide-up">
+            <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Criar Nova Lista
+            </h3>
+            <input type="text" id="listName" placeholder="Nome da lista" required 
+                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-primary transition-all">
+            <textarea id="listDescription" placeholder="Descrição (opcional)" rows="3"
+                      class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-primary transition-all resize-none"></textarea>
+            <div class="flex gap-3">
+                <button onclick="createList()" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-all hover:scale-105 font-semibold flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Criar
+                </button>
+                <button onclick="closeCreateListModal()" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-all hover:scale-105 font-semibold flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-16 border-t border-white/10 bg-black/40 backdrop-blur-xl">
+        <div class="container mx-auto px-4 py-10 max-w-6xl">
+            <div class="flex flex-col md:flex-row gap-8 md:items-center md:justify-between">
+                <div>
+                    <div class="text-lg font-extrabold tracking-wide">
+                        <span class="text-white">CINE</span><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-300">PIS</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-2 max-w-xl">Detalhes, trailer e reviews — tudo num só sítio.</p>
+                </div>
+                <!-- links movidos para a navbar -->
+            </div>
+            <div class="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-xs text-gray-500">
+                <span>© <span id="footerYear"></span> CinePIS</span>
+                <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <span>Feito com Tailwind CSS • Dados: TMDB</span>
+                    <span class="text-gray-600">|</span>
+                    <span>Desenvolvido por David Fernandes & João Rôlo & Sorin Revenco</span>
+                </div>
+            </div>
+        </div>
+        <script>document.getElementById('footerYear') && (document.getElementById('footerYear').textContent = new Date().getFullYear());</script>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl p-4 transform translate-y-[150%] transition-transform duration-300 z-50 max-w-sm w-[calc(100vw-2rem)]">
+        <div class="flex items-center gap-3">
+            <div id="toast-icon" class="text-2xl flex-shrink-0"></div>
+            <div class="min-w-0">
+                <p id="toast-message" class="font-semibold break-words"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/nav.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const idFilme = params.get('id') || params.get('tmdb_id');
+        let currentUserId = null;
+        let trailerKey = null;
+        let contentData = null;
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                info: 'ℹ'
+            };
+            
+            toastIcon.textContent = icons[type] || icons.info;
+            toastIcon.className = `text-2xl ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400'}`;
+            
+            toast.classList.remove('translate-y-[150%]');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[150%]');
+            }, 3000);
+        }
+
+        function initStarRating() {
+            const starContainer = document.getElementById('starRating');
+            starContainer.innerHTML = Array.from({length: 10}, (_, i) => 
+                `<button type="button" class="star-btn text-3xl text-gray-500 hover:text-yellow-400 transition-all hover:scale-125 cursor-pointer" data-rating="${i+1}" data-index="${i}">★</button>`
+            ).join('');
+            
+            const stars = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('userRating');
+            const ratingDisplay = document.getElementById('ratingDisplay');
+            let selectedRating = 0;
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    ratingInput.value = selectedRating;
+                    ratingDisplay.textContent = `${selectedRating}/10`;
+                    
+                    stars.forEach((s, i) => {
+                        if (i < selectedRating) {
+                            s.classList.remove('text-gray-500');
+                            s.classList.add('text-yellow-400');
+                        } else {
+                            s.classList.remove('text-yellow-400');
+                            s.classList.add('text-gray-500');
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseenter', () => {
+                    const hoverRating = index + 1;
+                    stars.forEach((s, i) => {
+                        if (i < hoverRating) {
+                            s.classList.add('text-yellow-300');
+                            s.classList.remove('text-gray-500');
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseleave', () => {
+                    stars.forEach((s, i) => {
+                        s.classList.remove('text-yellow-300');
+                        if (i < selectedRating) {
+                            s.classList.add('text-yellow-400');
+                        } else {
+                            s.classList.add('text-gray-500');
+                        }
+                    });
+                });
+            });
+        }
+
+        async function carregarPagina() {
+            if(!idFilme) {
+                showToast('ID não fornecido', 'error');
+                setTimeout(() => window.location.href = '/', 2000);
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const isLoggedIn = !!token;
+            
+            if (isLoggedIn) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    currentUserId = payload.id;
+                    document.getElementById('form-review-container').classList.remove('hidden');
+                    document.getElementById('btnFav').classList.remove('hidden');
+                    initStarRating();
+                    carregarListas();
+                } catch (e) {
+                    console.error('Erro ao decodificar token:', e);
+                }
+            } else {
+                document.getElementById('login-warning').classList.remove('hidden');
+            }
+
+            try {
+                const res = await fetch(`/api/filmes/${idFilme}`);
+                if (!res.ok) throw new Error("Conteúdo não encontrado");
+                
+                contentData = await res.json();
+                
+                document.getElementById('titulo').innerText = contentData.title;
+                document.getElementById('sinopse').innerText = contentData.synopsis || "Sem sinopse.";
+                document.getElementById('data').innerText = contentData.release_date ? new Date(contentData.release_date).toLocaleDateString('pt-PT') : 'N/A';
+                document.getElementById('rating').innerText = Number(contentData.vote_average || 0).toFixed(1);
+                document.getElementById('poster').src = contentData.poster_path || '/img/placeholder-poster.svg';
+                
+                if (contentData.genres && contentData.genres.length > 0) {
+                    document.getElementById('genres').innerHTML = contentData.genres.map(g => 
+                        `<span class="inline-block bg-gray-700 px-2 py-1 rounded text-xs mr-1">${g.name}</span>`
+                    ).join('');
+                } else {
+                    document.getElementById('genres').innerText = 'N/A';
+                }
+                
+                if (contentData.directors && contentData.directors.length > 0) {
+                    document.getElementById('directors').innerHTML = contentData.directors.map(d => {
+                        const safeName = (d.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        return d.id
+                            ? `<a class="text-primary hover:underline" href="/pages/frontoffice/diretor.html?id=${d.id}">${safeName}</a>`
+                            : safeName;
+                    }).join(', ');
+                } else {
+                    document.getElementById('directors').innerText = 'N/A';
+                }
+                
+                if (contentData.actors && contentData.actors.length > 0) {
+                    document.getElementById('actors').innerHTML = contentData.actors.slice(0, 5).map(a => {
+                        const safeName = (a.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        const role = a.character_name ? ` <span class="text-gray-400">(${String(a.character_name).replace(/</g,'&lt;').replace(/>/g,'&gt;')})</span>` : '';
+                        const base = a.id
+                            ? `<a class="text-primary hover:underline" href="/pages/frontoffice/ator.html?id=${a.id}">${safeName}</a>`
+                            : safeName;
+                        return base + role;
+                    }).join(', ');
+                } else {
+                    document.getElementById('actors').innerText = 'N/A';
+                }
+
+                // Trailer
+                if (contentData.trailer_key) {
+                    trailerKey = contentData.trailer_key;
+                    document.getElementById('btnTrailer').classList.remove('hidden');
+                }
+
+                // Similar & Recommendations
+                renderTMDBections();
+
+                if (isLoggedIn) {
+                    verificarSeEFavorito(token);
+                }
+
+                renderizarReviews(contentData.reviews, isLoggedIn);
+
+            } catch (erro) {
+                showToast(erro.message, 'error');
+                setTimeout(() => window.location.href = '/', 2000);
+            }
+        }
+
+        function renderTMDBections() {
+            const container = document.getElementById('tmdb-sections');
+            container.innerHTML = '';
+
+            let hasContent = false;
+
+            // Renderizar Títulos Similares
+            if (contentData.similar && Array.isArray(contentData.similar) && contentData.similar.length > 0) {
+                container.innerHTML += `
+                    <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-slide-up ${hasContent ? 'mt-6' : ''}">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            Títulos Similares
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                            ${contentData.similar.map(item => {
+                                const safeTitle = (item.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                const year = item.release_date ? new Date(item.release_date).getFullYear() : '';
+                                return `
+                                <div class="cursor-pointer group" onclick="window.location.href='/pages/frontoffice/detalhes.html?tmdb_id=${item.tmdb_id || item.id}'">
+                                    <div class="aspect-[2/3] overflow-hidden rounded-lg bg-gray-900 mb-2">
+                                        <img src="${item.poster_path || '/img/placeholder-poster.svg'}" 
+                                             alt="${safeTitle}" 
+                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                    </div>
+                                    <p class="text-sm font-semibold truncate group-hover:text-primary transition-colors">${safeTitle}</p>
+                                    ${year ? `<p class="text-xs text-gray-400">${year}</p>` : ''}
+                                </div>
+                            `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                hasContent = true;
+            }
+
+            // Renderizar Recomendações
+            if (contentData.recommendations && Array.isArray(contentData.recommendations) && contentData.recommendations.length > 0) {
+                container.innerHTML += `
+                    <div class="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-2xl animate-slide-up ${hasContent ? 'mt-6' : ''}">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Recomendações
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                            ${contentData.recommendations.map(item => {
+                                const safeTitle = (item.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                const year = item.release_date ? new Date(item.release_date).getFullYear() : '';
+                                return `
+                                <div class="cursor-pointer group" onclick="window.location.href='/pages/frontoffice/detalhes.html?tmdb_id=${item.tmdb_id || item.id}'">
+                                    <div class="aspect-[2/3] overflow-hidden rounded-lg bg-gray-900 mb-2">
+                                        <img src="${item.poster_path || '/img/placeholder-poster.svg'}" 
+                                             alt="${safeTitle}" 
+                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                    </div>
+                                    <p class="text-sm font-semibold truncate group-hover:text-primary transition-colors">${safeTitle}</p>
+                                    ${year ? `<p class="text-xs text-gray-400">${year}</p>` : ''}
+                                </div>
+                            `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                hasContent = true;
+            }
+
+            // Se não houver nenhum conteúdo, mostrar mensagem
+            if (!hasContent) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">Conteúdos similares e recomendações não disponíveis.</p>';
+            }
+        }
+
+        function formatReviewDate(value) {
+            if (!value) return '';
+            try {
+                const d = new Date(value);
+                if (Number.isNaN(d.getTime())) return '';
+                return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+            } catch {
+                return '';
+            }
+        }
+
+        function renderizarReviews(reviews, isLoggedIn) {
+            const lista = document.getElementById('lista-reviews');
+            lista.innerHTML = '';
+
+            if (!reviews || reviews.length === 0) {
+                lista.innerHTML = '<p class="text-gray-400">Ainda não há reviews. Sê o primeiro!</p>';
+                return;
+            }
+
+            reviews.forEach((r, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-700/50 rounded-lg p-4 border border-gray-600 animate-slide-up';
+                div.style.animationDelay = `${index * 0.1}s`;
+                
+                const isOwnReview = isLoggedIn && currentUserId && r.user_id === currentUserId;
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2 gap-4">
+                        <div class="min-w-0">
+                            <span class="font-semibold flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                <span class="truncate">${r.user_name}</span>
+                            </span>
+                            ${formatReviewDate(r.review_date) ? `
+                                <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    ${formatReviewDate(r.review_date)}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <span class="text-yellow-400 font-bold flex items-center gap-1 whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                            ${r.rating}/10
+                        </span>
+                    </div>
+                    <p class="text-gray-300 mb-2">${r.comment}</p>
+                    <div class="flex items-center justify-between">
+                        <small class="text-gray-500 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>
+                            <span id="count-${r.id}">${r.utility_counter || 0}</span> pessoas acharam útil
+                        </small>
+                        ${isLoggedIn && !isOwnReview ? `
+                            <button class="px-4 py-2 bg-gray-600 hover:bg-primary rounded-lg transition-all hover:scale-105 font-semibold flex items-center gap-2 text-sm" onclick="votarUtil(${r.id}, event)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>
+                                Útil
+                            </button>
+                        ` : ''}
+                        ${isOwnReview ? '<span class="text-xs text-gray-500 italic">(A tua review)</span>' : ''}
+                    </div>
+                `;
+                lista.appendChild(div);
+            });
+        }
+
+        async function verificarSeEFavorito(token) {
+            try {
+                const res = await fetch(`/api/favorites/check/${idFilme}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (res.status === 401 || res.status === 400) return;
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    atualizarBotaoVisual(data.isFavorite);
+                }
+            } catch (e) { console.error("Erro favorito:", e); }
+        }
+
+        async function toggleFav() {
+            const token = localStorage.getItem('token');
+            if(!token) {
+                showToast('Não estás logado!', 'error');
+                setTimeout(() => window.location.href = '/pages/auth/login.html', 1500);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/favorites/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ contentId: idFilme })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    atualizarBotaoVisual(data.isFavorite);
+                    showToast(data.isFavorite ? 'Adicionado aos favoritos!' : 'Removido dos favoritos!', 'success');
+                } else {
+                    const errorData = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+                    
+                    if (res.status === 401 || res.status === 400) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        showToast('Sessão expirada. Faz login novamente.', 'error');
+                        setTimeout(() => window.location.href = '/pages/auth/login.html', 2000);
+                    } else {
+                        showToast('Erro: ' + (errorData.error || 'Erro ao atualizar favorito'), 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar favorito:', error);
+                showToast('Erro de conexão. Tenta novamente.', 'error');
+            }
+        }
+
+        function atualizarBotaoVisual(isFav) {
+            const btn = document.getElementById('btnFav');
+            if (isFav) {
+                btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg> Remover dos Favoritos`;
+                btn.classList.add('bg-primary', 'text-white');
+                btn.classList.remove('border-2', 'border-primary', 'text-primary');
+            } else {
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg> Adicionar aos Favoritos`;
+                btn.classList.add('bg-primary', 'text-white');
+                btn.classList.remove('border-2', 'border-primary', 'text-primary');
+            }
+        }
+
+        function openTrailer() {
+            if (trailerKey) {
+                document.getElementById('trailerFrame').src = `https://www.youtube.com/embed/${trailerKey}?autoplay=1`;
+                document.getElementById('trailerModal').classList.remove('hidden');
+                document.getElementById('trailerModal').classList.add('flex');
+            }
+        }
+
+        function closeTrailer() {
+            document.getElementById('trailerFrame').src = '';
+            document.getElementById('trailerModal').classList.add('hidden');
+            document.getElementById('trailerModal').classList.remove('flex');
+        }
+
+        function toggleListDropdown() {
+            const dropdown = document.getElementById('listDropdown');
+            dropdown.classList.toggle('opacity-0');
+            dropdown.classList.toggle('invisible');
+            dropdown.classList.toggle('opacity-100');
+            dropdown.classList.toggle('visible');
+        }
+
+        async function carregarListas() {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch('/api/lists', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const lists = await res.json();
+                
+                const container = document.getElementById('listDropdownContent');
+                
+                if (lists.length === 0) {
+                    container.innerHTML = `
+                        <p class="text-gray-400 text-sm p-2 mb-2">Não tens listas criadas.</p>
+                        <button onclick="showCreateListModal()" class="w-full px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-all hover:scale-105 font-semibold flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Criar Lista
+                        </button>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = lists.map(list => `
+                    <button onclick="addToList(${list.id})" class="w-full text-left px-3 py-2 hover:bg-gray-700 rounded transition-colors flex items-center justify-between mb-1">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            ${list.name}
+                        </span>
+                        <span class="text-xs text-gray-400">${list.item_count || 0}</span>
+                    </button>
+                `).join('') + `
+                    <div class="border-t border-gray-700 mt-2 pt-2">
+                        <button onclick="showCreateListModal()" class="w-full px-3 py-2 hover:bg-gray-700 rounded transition-colors flex items-center gap-2 text-sm text-primary">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Criar Nova Lista
+                        </button>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar listas:', error);
+                document.getElementById('listDropdownContent').innerHTML = '<p class="text-red-400 text-sm p-2">Erro ao carregar listas</p>';
+            }
+        }
+
+        async function addToList(listId) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`/api/lists/${listId}/items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ contentId: idFilme })
+                });
+
+                if (res.ok) {
+                    showToast('Adicionado à lista com sucesso!', 'success');
+                    toggleListDropdown();
+                } else {
+                    const data = await res.json();
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar à lista:', error);
+                showToast('Erro ao adicionar à lista', 'error');
+            }
+        }
+
+        function showCreateListModal() {
+            document.getElementById('createListModal').classList.remove('hidden');
+            document.getElementById('createListModal').classList.add('flex');
+            toggleListDropdown();
+        }
+
+        function closeCreateListModal() {
+            document.getElementById('createListModal').classList.add('hidden');
+            document.getElementById('createListModal').classList.remove('flex');
+            document.getElementById('listName').value = '';
+            document.getElementById('listDescription').value = '';
+        }
+
+        async function createList() {
+            const name = document.getElementById('listName').value;
+            const description = document.getElementById('listDescription').value;
+
+            if (!name) {
+                showToast('Nome da lista é obrigatório', 'error');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch('/api/lists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ name, description })
+                });
+
+                if (res.ok) {
+                    showToast('Lista criada com sucesso!', 'success');
+                    closeCreateListModal();
+                    carregarListas();
+                    // Adicionar automaticamente à lista recém-criada
+                    const newList = await res.json();
+                    if (newList.id) {
+                        await addToList(newList.id);
+                    }
+                } else {
+                    const data = await res.json();
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao criar lista:', error);
+                showToast('Erro ao criar lista', 'error');
+            }
+        }
+
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            if(!token) {
+                showToast('Tens de estar logado!', 'error');
+                return;
+            }
+
+            const rating = document.getElementById('userRating').value;
+            const comment = document.getElementById('userComment').value;
+
+            if (!rating) {
+                showToast('Seleciona uma classificação com as estrelas!', 'error');
+                return;
+            }
+
+            const res = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ content_id: idFilme, rating, comment })
+            });
+
+            const resposta = await res.json();
+
+            if (res.ok) {
+                showToast('Obrigado pela tua review!', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast('Erro: ' + resposta.error, 'error');
+            }
+        });
+
+        async function votarUtil(reviewId, event) {
+            const token = localStorage.getItem('token');
+            if(!token) {
+                showToast('Login necessário', 'error');
+                return;
+            }
+
+            const buttonElement = event ? event.target.closest('button') : null;
+
+            try {
+                const res = await fetch(`/api/reviews/${reviewId}/vote`, { 
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (res.ok) {
+                    showToast('Voto registado!', 'success');
+                    const span = document.getElementById(`count-${reviewId}`);
+                    if (span) {
+                        span.innerText = parseInt(span.innerText) + 1;
+                    }
+                    if (buttonElement) {
+                        buttonElement.disabled = true;
+                        buttonElement.classList.add('opacity-50', 'cursor-not-allowed');
+                        buttonElement.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.834a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-5.834a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5zM14.667 9.5a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5v6.667a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5V9.5zM18.833 8.5a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5v7.667a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5V8.5z"></path></svg> Votado';
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+                    showToast('Erro: ' + (err.error || 'Erro ao votar'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao votar:', error);
+                showToast('Erro de conexão. Tenta novamente.', 'error');
+            }
+        }
+
+        // Hide page loader when content is ready
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('pageLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 300);
+                }
+            }, 500);
+        });
+
+        carregarPagina();
+    </script>
+</body>
+</html>
+
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
+</html>
