@@ -2,16 +2,20 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const { isAdmin } = require('../middleware/auth'); // Importar o porteiro
+const { isAdmin } = require('../middleware/auth');
 
-// Todas estas rotas exigem que o user seja ADMIN
-// GET /api/admin/contents -> Lista filmes para gestão
+// Conteúdos
 router.get('/contents', isAdmin, adminController.listContents);
-
-// POST /api/admin/contents -> Criar novo filme
 router.post('/contents', isAdmin, adminController.createContent);
-
-// DELETE /api/admin/contents/:id -> Apagar filme
 router.delete('/contents/:id', isAdmin, adminController.deleteContent);
+
+// Utilizadores
+router.get('/users', isAdmin, adminController.listUsers);
+router.delete('/users/:id', isAdmin, adminController.deleteUser);
+router.put('/users/:id/role', isAdmin, adminController.updateUserRole);
+
+// Reviews
+router.get('/reviews', isAdmin, adminController.listReviews);
+router.delete('/reviews/:id', isAdmin, adminController.deleteReview);
 
 module.exports = router;
